@@ -12,6 +12,6 @@ function setup() {
 }
 
 function draw() {
-  background('green');
+  background('purple');
   rect(50, 50, 100, 100);
 }

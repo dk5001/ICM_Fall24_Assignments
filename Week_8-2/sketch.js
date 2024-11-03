@@ -41,7 +41,7 @@ function preload() {
           cat.pixels[k + 0] = 0;
           cat.pixels[k + 1] = 255;
           cat.pixels[k + 2] = 0;
-          cat.pixels[k + 3] = 255;
+          cat.pixels[k + 3] = 50;
         }
       }
      } 
