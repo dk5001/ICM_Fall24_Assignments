@@ -4,6 +4,8 @@ let sounds = []; // Array to store multiple sound files
 let state = 0;
 let lastStateChange = 0;
 const INTERVAL = 4000; // 4 seconds in milliseconds
+let startTime = 0;
+let timerStarted = false;
 
 function setup() {
   createCanvas(400, 400);
@@ -18,9 +20,47 @@ function setup() {
 }
 
 function draw() {
-  // Check if it's time to change states
-  if (millis() - lastStateChange >= INTERVAL) {
+  let currentTime = millis();
+  if (currentTime - lastStateChange >= INTERVAL) {
     changeState();
+    if (!timerStarted && state === 1) {
+      startTime = currentTime;
+      timerStarted = true;
+    }
+  }
+  
+  // Clear background first
+  if (state == 1) {
+    background('red');
+  } else if (state == 2) {
+    background('gray');
+  } else {
+    background('green');
+  }
+  
+  // Then draw all text elements
+  textAlign(CENTER, TOP);
+  let elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+  let minutes = Math.floor(elapsedSeconds / 60);
+  let seconds = elapsedSeconds % 60;
+  let totalTimeString = minutes.toString().padStart(2, '0') + ':' + 
+                        seconds.toString().padStart(2, '0');
+  
+  text(totalTimeString, width/2, 20);
+  
+  // State timer display
+  textAlign(CENTER, CENTER);
+  let timeElapsed = currentTime - lastStateChange;
+  let secondsLeft = ((INTERVAL - timeElapsed) / 1000).toFixed(3);
+  text(secondsLeft + 's', width/2, height/2 - 30);
+  
+  // Status text
+  if (state == 1) {
+    text('Recording...', width/2, height/2);
+  } else if (state == 2) {
+    text('Processing...', width/2, height/2);
+  } else {
+    text('Playing... (' + sounds.length + ' layers)', width/2, height/2);
   }
 }
 
@@ -37,14 +77,14 @@ function changeState() {
     sounds.push(newSound);
     recorder.record(newSound);
     background('red');
-    text('Recording...', width / 2, height / 2);
+    text('Recording...', width/2, height/2);
     
   } else if (state == 2) {
     // Stop recording
     console.log('Stopping recording...');
     recorder.stop();
     background('gray');
-    text('Processing...', width / 2, height / 2);
+    text('Processing...', width/2, height/2);
     
   } else {
     // Play all recorded sounds
@@ -54,6 +94,6 @@ function changeState() {
       currentSound.loop();
     }
     background('green');
-    text('Playing... (' + sounds.length + ' layers)', width / 2, height / 2);
+    text('Playing... (' + sounds.length + ' layers)', width/2, height/2);
   }
 }
