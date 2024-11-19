@@ -3,7 +3,8 @@ let recorder;
 let sounds = []; // Array to store multiple sound files
 let state = 0;
 let lastStateChange = 0;
-const INTERVAL = 4000; // 4 seconds in milliseconds
+const RECORD_PLAY_INTERVAL = 2000;  // 4 seconds for recording/playing
+const PROCESS_INTERVAL = 10;        // 10ms for processing (extremely short)
 let startTime = 0;
 let timerStarted = false;
 
@@ -17,16 +18,17 @@ function setup() {
   textAlign(CENTER, CENTER);
   background('green');
   text('Recording will start automatically...', width / 2, height / 2);
+  
+  lastStateChange = millis();
+  startTime = millis(); // Initialize startTime right away
 }
 
 function draw() {
   let currentTime = millis();
-  if (currentTime - lastStateChange >= INTERVAL) {
+  let currentInterval = (state === 2) ? PROCESS_INTERVAL : RECORD_PLAY_INTERVAL;
+  
+  if (currentTime - lastStateChange >= currentInterval) {
     changeState();
-    if (!timerStarted && state === 1) {
-      startTime = currentTime;
-      timerStarted = true;
-    }
   }
   
   // Clear background first
@@ -38,23 +40,25 @@ function draw() {
     background('green');
   }
   
-  // Then draw all text elements
+  // Total time display - larger size
   textAlign(CENTER, TOP);
+  textSize(32);  // Larger size for total time
   let elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
   let minutes = Math.floor(elapsedSeconds / 60);
   let seconds = elapsedSeconds % 60;
   let totalTimeString = minutes.toString().padStart(2, '0') + ':' + 
                         seconds.toString().padStart(2, '0');
-  
   text(totalTimeString, width/2, 20);
   
-  // State timer display
+  // State timer display - medium size
   textAlign(CENTER, CENTER);
+  textSize(24);  // Medium size for countdown
   let timeElapsed = currentTime - lastStateChange;
-  let secondsLeft = ((INTERVAL - timeElapsed) / 1000).toFixed(3);
+  let secondsLeft = ((currentInterval - timeElapsed) / 1000).toFixed(3);
   text(secondsLeft + 's', width/2, height/2 - 30);
   
-  // Status text
+  // Status text - smaller size
+  textSize(16);  // Smaller size for status
   if (state == 1) {
     text('Recording...', width/2, height/2);
   } else if (state == 2) {
@@ -80,11 +84,10 @@ function changeState() {
     text('Recording...', width/2, height/2);
     
   } else if (state == 2) {
-    // Stop recording
-    console.log('Stopping recording...');
+    // Processing state
     recorder.stop();
-    background('gray');
-    text('Processing...', width/2, height/2);
+    // Force immediate change to next state
+    lastStateChange = lastStateChange - PROCESS_INTERVAL;  // This ensures immediate transition
     
   } else {
     // Play all recorded sounds
