@@ -10,7 +10,6 @@ let timerStarted = false;
 let pitchSlider;
 let playbackRate = 1.0;
 const TOTAL_TIME = 60;  // 60 seconds total
-const SEGMENTS = 60;    // One segment per second
 const BAR_HEIGHT = 10;  // Height of the progress bar
 
 function setup() {
@@ -50,26 +49,25 @@ function draw() {
     background('green');
   }
   
-  // Draw segmented progress bar
-  let elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-  let segmentWidth = width / SEGMENTS;
+  // Draw smooth progress bar
+  let elapsedTime = (currentTime - startTime) / 1000; // Time in seconds with decimals
+  let progress = elapsedTime / TOTAL_TIME; // Progress as a fraction (0 to 1)
+  let barWidth = width * progress; // Convert to pixels
   
-  // Draw all segments
-  for (let i = 0; i < SEGMENTS; i++) {
-    if (i < elapsedSeconds) {
-      fill(255);  // White for passed time
-    } else {
-      fill(0);  // Dark gray for remaining time
-    }
-    noStroke();
-    rect(i * segmentWidth, 0, segmentWidth - 1, BAR_HEIGHT);
-  }
+  // Draw background (remaining time)
+  noStroke();
+  fill(100);  // Dark gray
+  rect(0, 0, width, BAR_HEIGHT);
+  
+  // Draw progress (elapsed time)
+  fill(255);  // White
+  rect(0, 0, barWidth, BAR_HEIGHT);
   
   // Total time display - larger size
   textAlign(CENTER, TOP);
   textSize(32);  // Larger size for total time
-  minutes = Math.floor(elapsedSeconds / 60);
-  seconds = elapsedSeconds % 60;
+  minutes = Math.floor(elapsedTime / 60);
+  seconds = Math.floor(elapsedTime % 60);
   let totalTimeString = minutes.toString().padStart(2, '0') + ':' + 
                         seconds.toString().padStart(2, '0');
   text(totalTimeString, width/2, BAR_HEIGHT + 10);  // Moved down below the bar
