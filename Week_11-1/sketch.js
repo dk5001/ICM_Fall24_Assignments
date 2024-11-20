@@ -3,7 +3,7 @@ let recorder;
 let sounds = []; // Array to store multiple sound files
 let state = 0;
 let lastStateChange = 0;
-const RECORD_PLAY_INTERVAL = 2000;  // 4 seconds for recording/playing
+const RECORD_PLAY_INTERVAL = 2000;  // 2 seconds for recording/playing
 const PROCESS_INTERVAL = 10;        // 10ms for processing (extremely short)
 let startTime = 0;
 let timerStarted = false;
@@ -11,6 +11,15 @@ let pitchSlider;
 let playbackRate = 1.0;
 const TOTAL_TIME = 60;  // 60 seconds total
 const BAR_HEIGHT = 10;  // Height of the progress bar
+
+// Load sound files
+let sound1, sound2, sound3;
+
+function preload() {
+  sound1 = loadSound('sounds/1.mp3');
+  sound2 = loadSound('sounds/2.mp3');
+  sound3 = loadSound('sounds/3.mp3');
+}
 
 function setup() {
   createCanvas(400, 400);
@@ -56,7 +65,7 @@ function draw() {
   
   // Draw background (remaining time)
   noStroke();
-  fill(100);  // Dark gray
+  fill(50);  // Dark gray
   rect(0, 0, width, BAR_HEIGHT);
   
   // Draw progress (elapsed time)
@@ -136,5 +145,16 @@ function changeState() {
     }
     background('green');
     text('Playing... (' + sounds.length + ' layers)', width/2, height/2);
+  }
+}
+
+// Key pressed function to play sounds
+function keyPressed() {
+  if (key === '1') {
+    sound1.play();
+  } else if (key === '2') {
+    sound2.play();
+  } else if (key === '3') {
+    sound3.play();
   }
 }
